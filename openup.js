@@ -1,4 +1,3 @@
-<script>
 (function() {
   'use strict';
   
@@ -297,4 +296,3 @@
   window.openUpInstance = instance;
   
 })();
-</script>
