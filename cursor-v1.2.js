@@ -1,0 +1,252 @@
+(function() {
+  'use strict';
+  
+  const CFG = {
+    area: 'data-cursor-area',
+    btn: 'data-cursor-button',
+    link: 'data-cursor-link',
+    smoothness: 0.15,
+    throttle: 16,
+    fadeIn: 300,
+    fadeOut: 200
+  };
+  
+  class CursorFollower {
+    constructor() {
+      this.areas = [];
+      this.followers = new Map();
+      this.btn = null;
+      this.activeAreas = new Set();
+      this.tx = 0; this.ty = 0; this.cx = 0; this.cy = 0;
+      this.raf = 0;
+      this.visible = false;
+      this.overLink = false;
+      this.currentLink = null;
+      this.defaultText = '';
+      this.init();
+    }
+    
+    init() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setup());
+      } else {
+        this.setup();
+      }
+    }
+    
+    setup() {
+      if ('ontouchstart' in window && navigator.maxTouchPoints > 0) return;
+      
+      this.areas = [...document.querySelectorAll(`[${CFG.area}]`)];
+      if (!this.areas.length) return;
+      
+      this.btn = this.findOrCreateBtn();
+      this.defaultText = this.btn.textContent || this.btn.innerHTML || '';
+      this.injectCSS();
+      this.areas.forEach(a => this.initArea(a));
+    }
+    
+    findOrCreateBtn() {
+      let b = document.querySelector(`[${CFG.btn}]`);
+      if (b) return b;
+      
+      b = document.createElement('div');
+      b.setAttribute(CFG.btn, '');
+      b.className = 'cursor-follower-button';
+      b.style.cssText = 'position:fixed;pointer-events:none;z-index:9999;opacity:0';
+      document.body.appendChild(b);
+      return b;
+    }
+    
+    initArea(a) {
+      const f = new AreaFollower(a, this);
+      this.followers.set(a, f);
+    }
+    
+    addActive(a) {
+      this.activeAreas.add(a);
+      if (!this.visible) this.show();
+    }
+    
+    removeActive(a) {
+      this.activeAreas.delete(a);
+      if (!this.activeAreas.size) this.hide();
+    }
+    
+    updatePos(x, y) {
+      this.tx = x;
+      this.ty = y;
+    }
+    
+    setOverLink(isOver, link = null) {
+      this.overLink = isOver;
+      this.currentLink = link;
+      
+      if (isOver && link) {
+        this.btn.classList.add('over-link');
+        const linkText = link.getAttribute(CFG.link);
+        if (linkText) {
+          this.btn.innerHTML = linkText;
+        } else {
+          this.btn.innerHTML = 'CLICK';
+        }
+        this.btn.style.pointerEvents = 'auto';
+        this.btn.style.cursor = 'pointer';
+        
+        this.btn.onclick = () => {
+          if (link.tagName === 'A') {
+            link.click();
+          } else {
+            const href = link.getAttribute('href') || link.getAttribute(CFG.link);
+            if (href && href.startsWith('http')) {
+              window.location.href = href;
+            }
+          }
+        };
+      } else {
+        this.btn.classList.remove('over-link');
+        this.btn.innerHTML = this.defaultText;
+        this.btn.style.pointerEvents = 'none';
+        this.btn.style.cursor = 'default';
+        this.btn.onclick = null;
+      }
+    }
+    
+    show() {
+      if (!this.btn) return;
+      this.visible = true;
+      this.btn.style.transition = `opacity ${CFG.fadeIn}ms ease-out`;
+      this.btn.style.opacity = '1';
+      document.body.classList.add('cursor-active');
+      if (!this.raf) this.animate();
+    }
+    
+    hide() {
+      if (!this.btn) return;
+      this.visible = false;
+      this.btn.style.transition = `opacity ${CFG.fadeOut}ms ease-in`;
+      this.btn.style.opacity = '0';
+      document.body.classList.remove('cursor-active');
+      this.setOverLink(false);
+      if (this.raf) {
+        cancelAnimationFrame(this.raf);
+        this.raf = 0;
+      }
+    }
+    
+    animate() {
+      if (!this.visible || !this.btn) return;
+      
+      this.cx += (this.tx - this.cx) * CFG.smoothness;
+      this.cy += (this.ty - this.cy) * CFG.smoothness;
+      
+      this.btn.style.left = `${this.cx}px`;
+      this.btn.style.top = `${this.cy}px`;
+      this.btn.style.transform = 'translate(-50%,-50%)';
+      
+      this.raf = requestAnimationFrame(() => this.animate());
+    }
+    
+    injectCSS() {
+      const style = document.createElement('style');
+      style.textContent = `
+        [${CFG.area}].cursor-active{cursor:none!important}
+        [${CFG.area}].cursor-active *:not(a):not([${CFG.link}]){cursor:none!important}
+        [${CFG.area}].cursor-active a,[${CFG.area}].cursor-active [${CFG.link}]{cursor:pointer!important}
+        [${CFG.btn}]{position:fixed!important;z-index:9999!important;transform:translate(-50%,-50%);transition:background 0.2s,transform 0.2s}
+        [${CFG.btn}].over-link{transform:translate(-50%,-50%) scale(1.1)!important}
+      `;
+      document.head.appendChild(style);
+    }
+    
+    refresh() {
+      [...document.querySelectorAll(`[${CFG.area}]`)].forEach(a => {
+        if (!this.followers.has(a)) this.initArea(a);
+      });
+    }
+    
+    destroy() {
+      this.followers.forEach(f => f.destroy());
+      this.followers.clear();
+      if (this.raf) cancelAnimationFrame(this.raf);
+    }
+  }
+  
+  class AreaFollower {
+    constructor(area, manager) {
+      this.area = area;
+      this.mgr = manager;
+      this.currentHoverEl = null;
+      
+      this.throttledMove = this.throttle(e => {
+        this.mgr.updatePos(e.clientX, e.clientY);
+        
+        const target = document.elementFromPoint(e.clientX, e.clientY);
+        const link = target?.closest(`a, [${CFG.link}]`);
+        
+        if (link && link !== this.currentHoverEl) {
+          this.currentHoverEl = link;
+          this.mgr.setOverLink(true, link);
+        } else if (!link && this.currentHoverEl) {
+          this.currentHoverEl = null;
+          this.mgr.setOverLink(false);
+        }
+      }, CFG.throttle);
+      
+      this.area.addEventListener('mouseenter', () => {
+        this.area.classList.add('cursor-active');
+        this.mgr.addActive(this.area);
+      });
+      
+      this.area.addEventListener('mousemove', this.throttledMove);
+      
+      this.area.addEventListener('mouseleave', () => {
+        this.area.classList.remove('cursor-active');
+        this.mgr.removeActive(this.area);
+        this.currentHoverEl = null;
+        this.mgr.setOverLink(false);
+      });
+    }
+    
+    throttle(fn, delay) {
+      let timer, last = 0;
+      return function(...args) {
+        const now = Date.now();
+        if (now - last > delay) {
+          fn.apply(this, args);
+          last = now;
+        } else {
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            fn.apply(this, args);
+            last = Date.now();
+          }, delay - (now - last));
+        }
+      };
+    }
+    
+    destroy() {
+      this.area.classList.remove('cursor-active');
+      this.mgr.removeActive(this.area);
+    }
+  }
+  
+  const instance = new CursorFollower();
+  
+  window.CursorFollower = {
+    instance,
+    config: CFG,
+    refresh: () => instance.refresh(),
+    destroy: () => instance.destroy(),
+    addArea: el => {
+      el.setAttribute(CFG.area, '');
+      instance.initArea(el);
+    },
+    removeArea: el => {
+      instance.followers.get(el)?.destroy();
+      instance.followers.delete(el);
+      el.removeAttribute(CFG.area);
+    }
+  };
+  
+})();
