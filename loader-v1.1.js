@@ -6,7 +6,7 @@
     three: 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
     cube: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/cube-v1.1.js',
     openup: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/openup-v1.1.js',
-    cursor: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/cursor-v1.2.js'
+    cursor: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/cursor-v1.3.js'
   };
   
   function loadScript(url, blocking = false) {
