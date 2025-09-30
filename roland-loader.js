@@ -4,9 +4,9 @@
   
   const SCRIPTS = {
     three: 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
-    cube: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/3d-cube.js',
-    openup: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/openup.js',
-    cursor: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/cursor-follower.js'
+    cube: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/roland-cube.js',
+    openup: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/roland-openup.js',
+    cursor: 'https://cdn.jsdelivr.net/gh/greenbydefault/roland@main/roland-cursor.js'
   };
   
   function loadScript(url, blocking = false) {
