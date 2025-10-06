@@ -169,7 +169,7 @@
         
         [${CFG.btn}]{
           position:fixed!important;
-          z-index:99999!important;
+          z-index:2147483647!important;
           transform:translate(-50%,-50%) scale(0.5);
           pointer-events:none!important;
           opacity:0;
