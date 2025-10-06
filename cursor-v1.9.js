@@ -5,8 +5,7 @@
     area: 'data-cursor-area',
     btn: 'data-cursor-button',
     link: 'data-cursor-link',
-    textDefault: 'data-cursor-text-default',
-    textActive: 'data-cursor-text-active',
+    text: 'data-cursor-text',
     smoothness: 0.15,
     throttle: 16,
     fadeIn: 300,
@@ -43,8 +42,7 @@
       if (!this.areas.length) return;
       
       this.btn = this.findOrCreateBtn();
-      this.defaultText = this.btn.getAttribute(CFG.textDefault) || this.btn.textContent || '';
-      this.activeText = this.btn.getAttribute(CFG.textActive) || this.defaultText;
+      this.defaultText = this.btn.textContent || '';
       
       this.injectCSS();
       this.areas.forEach(a => this.initArea(a));
@@ -99,8 +97,11 @@
       this.currentClickableArea = clickableArea;
       if (clickableArea) {
         this.btn.classList.add('clickable');
-        if (this.activeText) {
-          this.btn.textContent = this.activeText;
+        const customText = clickableArea.getAttribute(CFG.text);
+        if (customText) {
+          this.btn.textContent = customText;
+        } else if (this.defaultText) {
+          this.btn.textContent = this.defaultText;
         }
       } else {
         this.btn.classList.remove('clickable');
