@@ -213,7 +213,11 @@
         this.mgr.updatePos(e.clientX, e.clientY);
         
         const target = document.elementFromPoint(e.clientX, e.clientY);
-        const clickableArea = target?.closest(`[${CFG.link}]`);
+        let clickableArea = target?.closest(`[${CFG.link}]`);
+        
+        if (!clickableArea && this.area.hasAttribute(CFG.link)) {
+          clickableArea = this.area;
+        }
         
         if (clickableArea !== this.lastClickableArea) {
           this.lastClickableArea = clickableArea;
@@ -225,6 +229,11 @@
         this.area.classList.add('cursor-active');
         this.mgr.updatePos(e.clientX, e.clientY);
         this.mgr.addActive(this.area);
+        
+        if (this.area.hasAttribute(CFG.link)) {
+          this.lastClickableArea = this.area;
+          this.mgr.setClickable(this.area);
+        }
       };
       
       this.onLeave = () => {
