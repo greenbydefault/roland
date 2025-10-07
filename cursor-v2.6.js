@@ -297,8 +297,16 @@
         const target = document.elementFromPoint(e.clientX, e.clientY);
         let clickableArea = target?.closest(`[${CFG.link}]`);
         
-        if (!clickableArea && this.area.hasAttribute(CFG.link)) {
-          clickableArea = this.area;
+        // Wenn kein Link gefunden, prüfe auf Link oder Overlay in der Area
+        if (!clickableArea) {
+          const hasLink = this.area.hasAttribute(CFG.link);
+          const areaId = this.area.getAttribute(CFG.area);
+          const hasOverlay = areaId && areaId !== '' && areaId !== 'true' && 
+                            document.querySelector(`[${CFG.overlay}="${areaId}"]`);
+          
+          if (hasLink || hasOverlay) {
+            clickableArea = this.area;
+          }
         }
         
         if (clickableArea !== this.lastClickableArea) {
@@ -312,7 +320,13 @@
         this.mgr.updatePos(e.clientX, e.clientY);
         this.mgr.addActive(this.area);
         
-        if (this.area.hasAttribute(CFG.link)) {
+        // Clickable wenn Link ODER Overlay existiert
+        const hasLink = this.area.hasAttribute(CFG.link);
+        const areaId = this.area.getAttribute(CFG.area);
+        const hasOverlay = areaId && areaId !== '' && areaId !== 'true' && 
+                          document.querySelector(`[${CFG.overlay}="${areaId}"]`);
+        
+        if (hasLink || hasOverlay) {
           this.lastClickableArea = this.area;
           this.mgr.setClickable(this.area);
         }
