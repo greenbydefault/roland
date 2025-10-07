@@ -4,7 +4,7 @@ Optimierte JavaScript-Komponenten für Roland Lodr's Webflow-Website.
 
 ## 📦 Scripts
 
-### 1. 3D Cube (`3d-cube.html`)
+### 1. 3D Cube (`cube-v1.2.js`)
 Interaktiver 3D-Würfel mit Three.js für die Hero-Section.
 
 **Features:**
@@ -12,7 +12,9 @@ Interaktiver 3D-Würfel mit Three.js für die Hero-Section.
 - Click-Navigation zu Listings
 - Responsive Sizing (4:3 Ratio)
 - Canvas-Texturen aus HTML-Elementen
-- Automatisches `/listings/` Prefix für Webflow-Slugs
+- Dynamische Items mit Nummern (beliebig viele)
+- Infinity-Rotation (Items wiederholen sich)
+- **KEINE Schattierung** (MeshBasicMaterial statt Lambert)
 - 3D-Rahmen mit Zylinder-Geometrie
 
 **Usage in Webflow:**
@@ -20,22 +22,23 @@ Interaktiver 3D-Würfel mit Three.js für die Hero-Section.
 <!-- In Webflow: Page Settings > Custom Code > Before </body> -->
 <div class="cube-container">
   <div class="cube-texture-sources">
-    <div data-side="front" data-link="your-slug-1">
+    <div data-cube-item="1" class="cube-texture-content" data-link="/your-link-1">
       <img src="..." data-cube-image="true" />
     </div>
-    <div data-side="right" data-link="your-slug-2">
+    <div data-cube-item="2" class="cube-texture-content" data-link="/your-link-2">
       <img src="..." data-cube-image="true" />
     </div>
-    <div data-side="left" data-link="your-slug-3">
+    <div data-cube-item="3" class="cube-texture-content" data-link="/your-link-3">
       <img src="..." data-cube-image="true" />
     </div>
+    <!-- Weitere Items optional -->
   </div>
   <canvas data-cube-canvas="true"></canvas>
 </div>
 
 <!-- Script einbinden -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<!-- 3d-cube.html Inhalt hier einfügen -->
+<script src="cube-v1.2.js"></script>
 ```
 
 **Performance:**
@@ -227,6 +230,13 @@ terser openup.js -c -m -o openup.min.js
 ---
 
 ## 📝 Changelog
+
+### v1.2.0 (2025-10-07)
+- 🔥 **3D Cube: Schattierung entfernt** (MeshBasicMaterial → keine Verdunkelung bei Rotation)
+- 🔥 **3D Cube: Click-Event Fix** (funktioniert jetzt auf allen Seiten)
+- ✨ **3D Cube: Dynamische Item-Struktur** (data-cube-item="1,2,3..." statt front/right/left)
+- ✨ **3D Cube: Infinity-Rotation** (Items wiederholen sich endlos)
+- ✨ **3D Cube: Beliebig viele Items** (nicht mehr auf 3 beschränkt)
 
 ### v2.0.0 (2025-09-30)
 - ✨ 3D Cube: Container-basierte Größenberechnung (Fix: Initial Sizing)
