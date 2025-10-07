@@ -4,7 +4,7 @@ Optimierte JavaScript-Komponenten für Roland Lodr's Webflow-Website.
 
 ## 📦 Scripts
 
-### 1. 3D Cube (`cube-v1.3.js`)
+### 1. 3D Cube (`cube-v1.4.js`)
 Interaktiver 3D-Würfel mit Three.js für die Hero-Section.
 
 **Features:**
@@ -40,7 +40,7 @@ Interaktiver 3D-Würfel mit Three.js für die Hero-Section.
 
 <!-- Script einbinden -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="cube-v1.3.js"></script>
+<script src="cube-v1.4.js"></script>
 ```
 
 **Performance:**
@@ -232,6 +232,12 @@ terser openup.js -c -m -o openup.min.js
 ---
 
 ## 📝 Changelog
+
+### v1.4.0 (2025-10-07)
+- 🔥 **3D Cube: 4-Seiten-Fix** (front, right, back, left - alle mit Texturen gefüllt)
+- 🔥 **3D Cube: Korrekte Item-Verteilung** bei 2 Items: Item1→Item2→Item1→Item2 (abwechselnd)
+- 🐛 **3D Cube: Fix leere/dunkle Seite** (back-Seite wird jetzt auch mit Texture gefüllt)
+- 🐛 **3D Cube: Fix falsche Links** (Click-Logik jetzt korrekt für 4 Seiten)
 
 ### v1.3.0 (2025-10-07)
 - 🔥 **3D Cube: Echte Infinity-Rotation** (auch mit 2 Items: 1-2-1-2-1-2... ohne leere Seiten)
