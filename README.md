@@ -4,7 +4,7 @@ Optimierte JavaScript-Komponenten für Roland Lodr's Webflow-Website.
 
 ## 📦 Scripts
 
-### 1. 3D Cube (`cube-v1.2.js`)
+### 1. 3D Cube (`cube-v1.3.js`)
 Interaktiver 3D-Würfel mit Three.js für die Hero-Section.
 
 **Features:**
@@ -13,7 +13,8 @@ Interaktiver 3D-Würfel mit Three.js für die Hero-Section.
 - Responsive Sizing (4:3 Ratio)
 - Canvas-Texturen aus HTML-Elementen
 - Dynamische Items mit Nummern (beliebig viele)
-- Infinity-Rotation (Items wiederholen sich)
+- **Echte Infinity-Rotation** (auch mit 1-2 Items: 1-2-1-2-1-2...)
+- **Automatisches `/listings/` Prefix** für Links
 - **KEINE Schattierung** (MeshBasicMaterial statt Lambert)
 - 3D-Rahmen mit Zylinder-Geometrie
 
@@ -22,23 +23,24 @@ Interaktiver 3D-Würfel mit Three.js für die Hero-Section.
 <!-- In Webflow: Page Settings > Custom Code > Before </body> -->
 <div class="cube-container">
   <div class="cube-texture-sources">
-    <div data-cube-item="1" class="cube-texture-content" data-link="/your-link-1">
+    <!-- Nur Slug angeben, /listings/ wird automatisch hinzugefügt -->
+    <div data-cube-item="1" class="cube-texture-content" data-link="your-slug-1">
       <img src="..." data-cube-image="true" />
     </div>
-    <div data-cube-item="2" class="cube-texture-content" data-link="/your-link-2">
+    <div data-cube-item="2" class="cube-texture-content" data-link="your-slug-2">
       <img src="..." data-cube-image="true" />
     </div>
-    <div data-cube-item="3" class="cube-texture-content" data-link="/your-link-3">
+    <!-- Optional: Weitere Items -->
+    <div data-cube-item="3" class="cube-texture-content" data-link="your-slug-3">
       <img src="..." data-cube-image="true" />
     </div>
-    <!-- Weitere Items optional -->
   </div>
   <canvas data-cube-canvas="true"></canvas>
 </div>
 
 <!-- Script einbinden -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="cube-v1.2.js"></script>
+<script src="cube-v1.3.js"></script>
 ```
 
 **Performance:**
@@ -230,6 +232,11 @@ terser openup.js -c -m -o openup.min.js
 ---
 
 ## 📝 Changelog
+
+### v1.3.0 (2025-10-07)
+- 🔥 **3D Cube: Echte Infinity-Rotation** (auch mit 2 Items: 1-2-1-2-1-2... ohne leere Seiten)
+- ✨ **3D Cube: Auto `/listings/` Prefix** (automatisch vor data-link hinzugefügt)
+- 🐛 **3D Cube: Fix leere Seite** bei weniger als 3 Items
 
 ### v1.2.0 (2025-10-07)
 - 🔥 **3D Cube: Schattierung entfernt** (MeshBasicMaterial → keine Verdunkelung bei Rotation)
